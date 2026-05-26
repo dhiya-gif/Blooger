@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>devlog — a tech & dev blog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0f0f;
+    --ink-muted: #6b6b6b;
+    --ink-faint: #b0b0b0;
+    --bg: #fafaf8;
+    --bg-surface: #f3f3f0;
+    --border: #e4e4df;
+    --accent: #1a6ef7;
+    --accent-soft: #eaf0ff;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --radius: 6px;
+    --max: 780px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #f0f0ec;
+      --ink-muted: #8a8a84;
+      --ink-faint: #4a4a46;
+      --bg: #111110;
+      --bg-surface: #1c1c1a;
+      --border: #2a2a26;
+      --accent: #5b9bff;
+      --accent-soft: #1a2540;
+    }
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+
+  .nav-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    gap: 2rem;
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-logo span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: blink 1.4s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.75rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink-muted);
+    transition: color 0.15s;
+  }
+
+  .nav-links a:hover { color: var(--ink); }
+
+  .nav-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s;
+  }
+
+  .nav-tag:hover { background: var(--border); }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 5rem 2rem 3.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--ink);
+    max-width: 580px;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--ink-muted);
+    max-width: 480px;
+    line-height: 1.65;
+  }
+
+  /* ── TOPICS STRIP ── */
+  .topics-strip {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .topic-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--ink-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip:hover, .chip.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  /* ── FEATURED POST ── */
+  .featured-wrap {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+  }
+
+  .featured-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  @media (max-width: 640px) {
+    .featured-card { grid-template-columns: 1fr; gap: 1.5rem; }
+  }
+
+  .featured-img {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .code-preview {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: var(--ink-muted);
+    padding: 1.5rem;
+    width: 100%;
+    user-select: none;
+  }
+
+  .code-preview .kw { color: var(--accent); }
+  .code-preview .fn { color: #e07b54; }
+  .code-preview .st { color: #4caf7d; }
+  .code-preview .cm { color: var(--ink-faint); font-style: italic; }
+
+  .featured-meta { display: flex; flex-direction: column; justify-content: center; }
+
+  .post-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .featured-meta h2 {
+    font-size: 1.55rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+
+  .featured-meta h2 a:hover { color: var(--accent); }
+
+  .excerpt {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .post-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-family: var(--mono);
+  }
+
+  .post-footer .author { color: var(--ink-muted); }
+
+  .read-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--accent);
+    margin-top: 1rem;
+    transition: gap 0.2s;
+  }
+
+  .read-link:hover { gap: 10px; }
+
+  /* ── POST GRID ── */
+  .posts-section {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  .posts-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .view-all {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-muted);
+    transition: color 0.15s;
+  }
+
+  .view-all:hover { color: var(--accent); }
+
+  .post-list { display: flex; flex-direction: column; gap: 0; }
+
+  .post-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .post-item:hover { opacity: 0.75; }
+  .post-item:last-child { border-bottom: none; }
+
+  .post-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    padding-top: 4px;
+  }
+
+  .post-info h3 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+  }
+
+  .post-info p {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    margin-bottom: 0.65rem;
+  }
+
+  .post-meta-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  .post-meta-row .tag { margin-right: 0; }
+
+  /* ── SIDEBAR / 2-COL LAYOUT ── */
+  .main-layout {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  @media (max-width: 640px) {
+    .main-layout { grid-template-columns: 1fr; gap: 2rem; }
+  }
+
+  .sidebar { padding-top: 3rem; }
+
+  .sidebar-section { margin-bottom: 2.5rem; }
+
+  .sidebar-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-bottom: 1rem;
+  }
+
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .newsletter-form input {
+    width: 100%;
+    padding: 9px 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .newsletter-form input::placeholder { color: var(--ink-faint); }
+  .newsletter-form input:focus { border-color: var(--accent); }
+
+  .newsletter-form button {
+    padding: 9px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .newsletter-form button:hover { opacity: 0.8; }
+
+  .trending-list { list-style: none; display: flex; flex-direction: column; gap: 0.9rem; }
+
+  .trending-list li {
+    display: flex;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .t-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 16px;
+    padding-top: 2px;
+  }
+
+  .t-title {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.45;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .t-title:hover { color: var(--ink); }
+
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+  }
+
+  .footer-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-links { display: flex; gap: 1.25rem; }
+  .footer-links a:hover { color: var(--ink-muted); }
+
+  /* ── ARTICLE VIEW ── */
+  #article-view {
+    display: none;
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  #article-view.show { display: block; }
+  .main-content.hide { display: none; }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2.5rem;
+    transition: color 0.15s;
+  }
+
+  .back-btn:hover { color: var(--ink); }
+
+  .article-header { margin-bottom: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+
+  .article-header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 400;
+    line-height: 1.25;
+    margin: 1rem 0 0.75rem;
+  }
+
+  .article-header .excerpt {
+    font-size: 15px;
+    color: var(--ink-muted);
+    margin-bottom: 1.25rem;
+    line-height: 1.65;
+  }
+
+  .article-body { font-size: 15.5px; line-height: 1.8; color: var(--ink); }
+  .article-body h2 { font-size: 1.2rem; font-weight: 500; margin: 2.5rem 0 0.75rem; }
+  .article-body p { margin-bottom: 1.2rem; }
+
+  .article-body code {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .article-body pre {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .article-body pre .kw { color: var(--accent); }
+  .article-body pre .fn { color: #e07b54; }
+  .article-body pre .st { color: #4caf7d; }
+  .article-body pre .cm { color: var(--ink-faint); font-style: italic; }
+
+  .article-body blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.25rem;
+    margin: 1.5rem 0;
+    color: var(--ink-muted);
+    font-size: 15px;
+  }
+
+  .read-time {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    border-radius: 20px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#" onclick="showHome()"><span></span>devlog</a>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showHome()">Home</a></li>
+      <li><a href="#">Articles</a></li>
+      <li><a href="#">Projects</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+    <span class="nav-tag">RSS</span>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="main-content">
+
+  <section class="hero">
+    <p class="hero-eyebrow">// software · systems · ideas</p>
+    <h1>Writing about <em>code</em> the way it should be written.</h1>
+    <p class="hero-sub">Deep dives into web dev, systems programming, architecture patterns, and the occasional hot take on tooling.</p>
+  </section>
+
+  <div class="topics-strip">
+    <span class="topic-label">topics:</span>
+    <span class="chip active">All</span>
+    <span class="chip">JavaScript</span>
+    <span class="chip">Rust</span>
+    <span class="chip">DevOps</span>
+    <span class="chip">Architecture</span>
+    <span class="chip">TypeScript</span>
+    <span class="chip">AI/ML</span>
+    <span class="chip">Open Source</span>
+  </div>
+
+  <section class="featured-wrap">
+    <p class="section-label">// featured post</p>
+    <div class="featured-card">
+      <div class="featured-img">
+        <div class="code-preview">
+<span class="cm">// async runtime internals</span>
+<span class="kw">async fn</span> <span class="fn">spawn_task</span>() {
+  <span class="kw">let</span> handle = tokio::spawn(
+    <span class="kw">async</span> {
+      fetch_data().<span class="fn">await</span>
+    }
+  );
+  handle.<span class="fn">await</span>.unwrap();
+}
+        </div>
+      </div>
+      <div class="featured-meta">
+        <div class="post-tags">
+          <span class="tag">Rust</span>
+          <span class="tag">async</span>
+          <span class="tag">systems</span>
+        </div>
+        <h2><a href="#" onclick="openArticle('featured'); return false;">Understanding Tokio's Async Runtime: A Deep Dive</a></h2>
+        <p class="excerpt">How does Tokio actually schedule tasks across threads? We trace the lifecycle of a future from spawn to completion, examining work-stealing queues and the I/O driver.</p>
+        <div class="post-footer">
+          <span class="author">Maya Chen</span>
+          <span>·</span>
+          <span>Jun 12, 2025</span>
+          <span>·</span>
+          <span>12 min read</span>
+        </div>
+        <a href="#" class="read-link" onclick="openArticle('featured'); return false;">Read article →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="main-layout">
+    <section class="posts-section" style="padding: 3rem 0 0;">
+      <div class="posts-header">
+        <p class="section-label" style="margin: 0;">// recent posts</p>
+        <a href="#" class="view-all">view all →</a>
+      </div>
+
+      <div class="post-list">
+        <div class="post-item" onclick="openArticle('ts')">
+          <div class="post-num">01 &nbsp;·&nbsp;<br>May 28</div>
+          <div class="post-info">
+            <h3>TypeScript's `satisfies` Operator Is Underrated</h3>
+            <p>Using satisfies to validate object shapes without widening types — and why you should prefer it over `as` in most cases.</p>
+            <div class="post-meta-row"><span class="tag">TypeScript</span><span>5 min read</span></div>
+          </div>
+        </div>
+
+        <div class="post-item" onclick="openArticle('perf')">
+          <div class="post-num">02 &nbsp;·&nbsp;<br>May 20</div>
+          <div class="post-info">
+            <h3>Profiling Node.js Apps Without Losing Your Mind</h3>
+            <p>A practical guide to using `--prof`, Clinic.js, and V8 heap snapshots to find bottlenecks in production Node services.</p>
+            <div class="post-meta-row"><span class="tag">JavaScript</span><span>9 min read</span></div>
+          </div>
+        </div>
+
+        <div class="post-item" onclick="openArticle('arch')">
+          <div class="post-num">03 &nbsp;·&nbsp;<br>May 11</div>
+          <div class="post-info">
+            <h3>Why I Stopped Using Microservices for Everything</h3>
+            <p>The organizational and technical costs that nobody talks about — and what a modular monolith actually looks like in practice.</p>
+            <div class="post-meta-row"><span class="tag">Architecture</span><span>7 min read</span></div>
+          </div>
+        </div>
+
+        <div class="post-item" onclick="openArticle('ci')">
+          <div class="post-num">04 &nbsp;·&nbsp;<br>May 03</div>
+          <div class="post-info">
+            <h3>GitHub Actions Caching: Do It Right</h3>
+            <p>Deterministic cache keys, cross-branch restores, and how to shave 4 minutes off your CI pipeline with one change.</p>
+            <div class="post-meta-row"><span class="tag">DevOps</span><span>4 min read</span></div>
+          </div>
+        </div>
+
+        <div class="post-item" onclick="openArticle('llm')">
+          <div class="post-num">05 &nbsp;·&nbsp;<br>Apr 25</div>
+          <div class="post-info">
+            <h3>Building a Local RAG Pipeline with Ollama + LanceDB</h3>
+            <p>End-to-end walkthrough: embeddings, vector search, chunking strategy, and prompt engineering for document Q&amp;A without the cloud bill.</p>
+            <div class="post-meta-row"><span class="tag">AI/ML</span><span>11 min read</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <p class="sidebar-title">// newsletter</p>
+        <p style="font-size: 13px; color: var(--ink-muted); margin-bottom: 1rem; line-height: 1.55;">New posts, twice a month. No fluff, no spam.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="your@email.com" />
+          <button type="button">Subscribe →</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-title">// trending</p>
+        <ul class="trending-list">
+          <li><span class="t-num">01</span><span class="t-title" onclick="openArticle('featured')">Understanding Tokio's Async Runtime</span></li>
+          <li><span class="t-num">02</span><span class="t-title" onclick="openArticle('llm')">Local RAG Pipeline with Ollama</span></li>
+          <li><span class="t-num">03</span><span class="t-title" onclick="openArticle('arch')">Microservices: The Hidden Costs</span></li>
+          <li><span class="t-num">04</span><span class="t-title" onclick="openArticle('ts')">TypeScript satisfies Operator</span></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-title">// tags</p>
+        <div class="tag-cloud">
+          <span class="chip">Rust</span>
+          <span class="chip">JS</span>
+          <span class="chip">TS</span>
+          <span class="chip">DevOps</span>
+          <span class="chip">AI</span>
+          <span class="chip">CLI</span>
+          <span class="chip">perf</span>
+          <span class="chip">arch</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+</div>
+
+<!-- ARTICLE VIEW -->
+<div id="article-view">
+  <button class="back-btn" onclick="showHome()">← back to all posts</button>
+  <div id="article-content"></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span>© 2025 devlog — written with care</span>
+    <div class="footer-links">
+      <a href="#">GitHub</a>
+      <a href="#">Twitter</a>
+      <a href="#">RSS</a>
+      <a href="#">About</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const articles = {
+  featured: {
+    tags: ['Rust', 'async', 'systems'],
+    date: 'June 12, 2025',
+    readTime: '12 min read',
+    author: 'Maya Chen',
+    title: "Understanding Tokio's Async Runtime: A Deep Dive",
+    excerpt: "How does Tokio actually schedule tasks across threads? We trace the lifecycle of a future from spawn to completion, examining work-stealing queues and the I/O driver.",
+    body: `
+      <h2>Why async Rust is different</h2>
+      <p>Most async runtimes hide their internals behind a pleasant API. Tokio is no different on the surface — <code>tokio::spawn</code>, <code>.await</code>, and you're done. But what actually happens when you call <code>spawn</code>?</p>
+      <blockquote>Futures in Rust are lazy. Nothing happens until you <code>.await</code> them or hand them to an executor.</blockquote>
+      <h2>The work-stealing scheduler</h2>
+      <p>Tokio's multi-threaded runtime uses a work-stealing scheduler. Each worker thread has its own local run queue, but can steal tasks from other threads when idle. This keeps CPU utilisation high without global lock contention.</p>
+      <pre><span class="cm">// Spawning a task onto the runtime</span>
+<span class="kw">let</span> handle = tokio::spawn(<span class="kw">async</span> {
+    <span class="kw">let</span> data = fetch_from_db().<span class="fn">await</span>;
+    process(data)
+});
+
+<span class="cm">// Awaiting the JoinHandle</span>
+<span class="kw">let</span> result = handle.<span class="fn">await</span>?;</pre>
+      <h2>I/O and the reactor</h2>
+      <p>Tokio registers file descriptors with the OS's <code>epoll</code>/<code>kqueue</code> interface via <code>mio</code>. When a socket becomes readable, the reactor wakes up the parked future, which gets re-queued on the next available worker thread.</p>
+      <p>This is why Tokio can handle tens of thousands of concurrent connections with a handful of OS threads — most futures spend their time parked, not running.</p>
+      <h2>What this means for you</h2>
+      <p>Understanding the runtime helps you avoid common pitfalls: blocking synchronous code inside async functions starves the runtime, spawning millions of tiny tasks wastes scheduler overhead, and mixing CPU-bound work with I/O can cause latency spikes.</p>
+    `
+  },
+  ts: {
+    tags: ['TypeScript'],
+    date: 'May 28, 2025',
+    readTime: '5 min read',
+    author: 'Dev Kaur',
+    title: "TypeScript's `satisfies` Operator Is Underrated",
+    excerpt: "Using satisfies to validate object shapes without widening types — and why you should prefer it over `as` in most cases.",
+    body: `
+      <h2>The problem with type assertions</h2>
+      <p>We've all written <code>as SomeType</code> to silence the compiler. The issue is that <code>as</code> is a promise to TypeScript: "trust me, I know what this is." It turns off type inference on the right-hand side entirely.</p>
+      <pre><span class="cm">// ❌ as widens and silences</span>
+<span class="kw">const</span> config = {
+  port: <span class="st">"3000"</span>, <span class="cm">// string — but no error</span>
+} <span class="kw">as</span> Config;
+
+<span class="cm">// ✅ satisfies validates, keeps inference</span>
+<span class="kw">const</span> config = {
+  port: <span class="st">"3000"</span>, <span class="cm">// TS error: expected number</span>
+} <span class="kw">satisfies</span> Config;</pre>
+      <h2>When satisfies shines</h2>
+      <p>The real power is that <code>satisfies</code> validates the shape but keeps the narrowest inferred type. So <code>config.port</code> is still typed as <code>string</code>, not the union <code>string | number</code> that your interface might declare.</p>
+      <blockquote>satisfies checks the constraint at definition time, then gets out of the way. as casts at runtime. They solve different problems.</blockquote>
+    `
+  },
+  arch: {
+    tags: ['Architecture'],
+    date: 'May 11, 2025',
+    readTime: '7 min read',
+    author: 'Maya Chen',
+    title: "Why I Stopped Using Microservices for Everything",
+    excerpt: "The organizational and technical costs that nobody talks about — and what a modular monolith actually looks like in practice.",
+    body: `
+      <h2>The dream vs. the reality</h2>
+      <p>Microservices promised independent deployability, team autonomy, and infinite scale. For teams at Netflix or Uber, that's real. For a 5-person startup? You inherit all the distributed systems complexity without the organisational structure to justify it.</p>
+      <h2>What a modular monolith actually looks like</h2>
+      <p>The key insight is that deployment boundaries and module boundaries are different things. You can have strict module isolation, clean APIs between domains, and independent development — all inside a single deployable artifact.</p>
+      <pre><span class="cm">// Hard module boundaries via barrel exports</span>
+<span class="cm">// src/billing/index.ts — only these are public</span>
+<span class="kw">export</span> { <span class="fn">createInvoice</span>, <span class="fn">getSubscription</span> } <span class="kw">from</span> <span class="st">'./api'</span>;</pre>
+      <blockquote>The discipline of microservices is good. The operational overhead is not always worth it.</blockquote>
+      <p>When you genuinely need to scale a single component independently or isolate failure domains — then extract. Until then, keep it simple.</p>
+    `
+  },
+  perf: {
+    tags: ['JavaScript'],
+    date: 'May 20, 2025',
+    readTime: '9 min read',
+    author: 'Tom Reyes',
+    title: "Profiling Node.js Apps Without Losing Your Mind",
+    excerpt: "A practical guide to using --prof, Clinic.js, and V8 heap snapshots to find bottlenecks in production Node services.",
+    body: `
+      <h2>Start with --prof</h2>
+      <p>Node's built-in profiler is the fastest way to get a flamegraph. Run your app with <code>--prof</code>, process the output with <code>--prof-process</code>, and you get a breakdown of where V8 is spending its time.</p>
+      <pre>node --prof server.js
+<span class="cm"># ... run your load test ...</span>
+node --prof-process isolate-*.log > profile.txt</pre>
+      <h2>Heap snapshots for memory leaks</h2>
+      <p>When RSS keeps climbing, take two heap snapshots 60 seconds apart and diff them in Chrome DevTools. The objects that grew between snapshots are your suspects. Event listener leaks and closure references account for 80% of cases.</p>
+      <blockquote>Profile before you optimise. Intuition about where the bottleneck is will be wrong more often than it's right.</blockquote>
+    `
+  },
+  ci: {
+    tags: ['DevOps'],
+    date: 'May 3, 2025',
+    readTime: '4 min read',
+    author: 'Dev Kaur',
+    title: "GitHub Actions Caching: Do It Right",
+    excerpt: "Deterministic cache keys, cross-branch restores, and how to shave 4 minutes off your CI pipeline with one change.",
+    body: `
+      <h2>Why most caches miss</h2>
+      <p>The most common mistake is using <code>hashFiles('package-lock.json')</code> as your entire cache key. Any lockfile change busts the whole cache, even if you only updated one dev dependency. A tiered fallback key strategy fixes this.</p>
+      <pre><span class="st">- uses:</span> actions/cache@v4
+  <span class="st">with:</span>
+    <span class="st">path:</span> ~/.npm
+    <span class="st">key:</span> npm-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+    <span class="st">restore-keys:</span> |
+      npm-${{ runner.os }}-</pre>
+      <h2>The restore-keys trick</h2>
+      <p>The <code>restore-keys</code> list is tried in order when the primary key misses. A partial cache with stale packages is still faster than a cold install — npm will only download the delta.</p>
+      <blockquote>A cache hit on a stale cache is almost always faster than no cache at all. Design your keys for partial matches.</blockquote>
+    `
+  },
+  llm: {
+    tags: ['AI/ML'],
+    date: 'April 25, 2025',
+    readTime: '11 min read',
+    author: 'Maya Chen',
+    title: "Building a Local RAG Pipeline with Ollama + LanceDB",
+    excerpt: "End-to-end walkthrough: embeddings, vector search, chunking strategy, and prompt engineering for document Q&A without the cloud bill.",
+    body: `
+      <h2>The stack</h2>
+      <p>Ollama serves local LLMs (we'll use <code>llama3.2</code> for generation and <code>nomic-embed-text</code> for embeddings). LanceDB is an embedded vector database that stores and searches embeddings with no separate server required.</p>
+      <pre><span class="cm"># Install deps</span>
+pip install lancedb ollama langchain-text-splitters
+
+<span class="cm"># Pull models</span>
+ollama pull llama3.2
+ollama pull nomic-embed-text</pre>
+      <h2>Chunking strategy matters more than model choice</h2>
+      <p>Most RAG quality problems are chunking problems. Too small and you lose context; too large and irrelevant content dilutes the retrieval signal. For most documents, recursive character splitting at 512 tokens with 64-token overlap is a reasonable start.</p>
+      <blockquote>Garbage in, garbage out. Spend more time on your chunking and retrieval strategy than on model selection.</blockquote>
+      <h2>Prompt engineering for RAG</h2>
+      <p>Instruct the model to answer only from the provided context and to say it doesn't know if the context is insufficient. This prevents hallucination without needing a separate guardrail layer.</p>
+    `
+  }
+};
+
+function openArticle(id) {
+  const article = articles[id];
+  if (!article) return;
+  const tagsHtml = article.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  document.getElementById('article-content').innerHTML = `
+    <div class="article-header">
+      <div class="post-tags">${tagsHtml}</div>
+      <h1>${article.title}</h1>
+      <p class="excerpt">${article.excerpt}</p>
+      <div class="post-footer">
+        <span class="author">${article.author}</span>
+        <span>·</span>
+        <span>${article.date}</span>
+        <span>·</span>
+        <span class="read-time">${article.readTime}</span>
+      </div>
+    </div>
+    <div class="article-body">${article.body}</div>
+  `;
+  document.getElementById('main-content').classList.add('hide');
+  document.getElementById('article-view').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showHome() {
+  document.getElementById('main-content').classList.remove('hide');
+  document.getElementById('article-view').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+document.querySelector('.newsletter-form button').addEventListener('click', function() {
+  const input = document.querySelector('.newsletter-form input');
+  if (input.value && input.value.includes('@')) {
+    this.textContent = 'Subscribed ✓';
+    this.style.background = '#2d7a4f';
+    input.value = '';
+    input.disabled = true;
+    this.disabled = true;
+  } else {
+    input.style.borderColor = '#e24b4a';
+    setTimeout(() => input.style.borderColor = '', 1500);
+  }
+});
+</script>
+</body>
+</html>
